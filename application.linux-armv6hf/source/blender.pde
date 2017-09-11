@@ -72,28 +72,29 @@ void getJSON() {
   }
 }
 void setup() {
-  try{
-  configFile = new Properties();
+  try {
+    configFile = new Properties();
     String dp = dataPath("config.properties");
     FileInputStream f = new FileInputStream(dp);
     configFile.load(f);
-    println(configFile);
-  } catch(Exception e){
-     e.printStackTrace(); 
+   // println(configFile);
+  } 
+  catch(Exception e) {
+    e.printStackTrace();
   }
-    /*
+  /*
     REFERENCE FOR CONFIG FILE PARSING
-    AREA = configFile.getProperty("AREA");
-
-    overlayY = Integer.parseInt(configFile.getProperty("OVERLAY_Y"));
-    overlayX = Integer.parseInt(configFile.getProperty("OVERLAY_X"));
-    */
+   AREA = configFile.getProperty("AREA");
+   
+   overlayY = Integer.parseInt(configFile.getProperty("OVERLAY_Y"));
+   overlayX = Integer.parseInt(configFile.getProperty("OVERLAY_X"));
+   */
   //stroke(255);
   //fill(255);
   lon=configFile.getProperty("lon");
   lat=configFile.getProperty("lat");
   mAngle=Float.parseFloat(configFile.getProperty("mAngle"));
-  
+
   //if angle is passed as arg use it...
   if (args != null) {
     for (int arrg=0; arrg<args.length; arrg++) {
@@ -106,30 +107,29 @@ void setup() {
       lon=args[2];
     }
     configFile.setProperty("mAngle", Float.toString(mAngle));
-    configFile.setProperty("lat",lat);
-    configFile.setProperty("lon",lon);
-    try{
+    configFile.setProperty("lat", lat);
+    configFile.setProperty("lon", lon);
+    try {
       String dp = dataPath("config.properties");
-    FileOutputStream f = new FileOutputStream(dp);
-    configFile.store(f,null); 
-    }catch(Exception ex){
-      
+      FileOutputStream f = new FileOutputStream(dp);
+      configFile.store(f, null);
+    }
+    catch(Exception ex) {
     }
   } 
   url="http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lon +"&APPID="+ apikey;
 
 
-  thread("getJSON");
-
+  getJSON();
   background(1, 1, 1);
   size(640, 640);
   colorMode(HSB, 360, 100, 100);
   newx=width/2*-1;
   //  knots=round(5);//get from api
   //  cardinal=(deg+60)*TWO_PI/360;//get from api lights are offset 60 deg from north
-  h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue)
+  h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue) //<>//
   s=100;
-  b=0;
+  b=0; //<>//
   img = createImage(1280, 1280, RGB); //<>//
   thread("buildImg");  
   opc = new OPC(this, "127.0.0.1", 7890);

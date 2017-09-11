@@ -77,7 +77,7 @@ void setup() {
     String dp = dataPath("config.properties");
     FileInputStream f = new FileInputStream(dp);
     configFile.load(f);
-    println(configFile);
+   // println(configFile);
   } 
   catch(Exception e) {
     e.printStackTrace();
@@ -120,18 +120,17 @@ void setup() {
   url="http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lon +"&APPID="+ apikey;
 
 
-  thread("getJSON");
-
+  getJSON();
   background(1, 1, 1);
   size(640, 640);
   colorMode(HSB, 360, 100, 100);
   newx=width/2*-1;
   //  knots=round(5);//get from api
   //  cardinal=(deg+60)*TWO_PI/360;//get from api lights are offset 60 deg from north
-  h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue)
+  h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue) //<>//
   s=100;
   b=0; //<>//
-  img = createImage(1280, 1280, RGB);
+  img = createImage(1280, 1280, RGB); //<>//
   thread("buildImg");  
   opc = new OPC(this, "127.0.0.1", 7890);
   float spacing = width / 20.0;
