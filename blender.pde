@@ -92,7 +92,7 @@ void setup() {
   //fill(255);
   lon=configFile.getProperty("lon");
   lat=configFile.getProperty("lat");
-  mAngle=Float.parseFloat(configFile.getProperty("mAngle");
+  mAngle=Float.parseFloat(configFile.getProperty("mAngle"));
   
   //if angle is passed as arg use it...
   if (args != null) {
