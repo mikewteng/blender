@@ -72,12 +72,15 @@ void getJSON() {
   }
 }
 void setup() {
-  
+  try{
   configFile = new Properties();
     String dp = dataPath("config.properties");
     FileInputStream f = new FileInputStream(dp);
     configFile.load(f);
     println(configFile);
+  } catch(Exception e){
+     e.printStackTrace(); 
+  }
     /*
     REFERENCE FOR CONFIG FILE PARSING
     AREA = configFile.getProperty("AREA");
