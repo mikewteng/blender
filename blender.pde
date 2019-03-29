@@ -162,10 +162,10 @@ renderGradient();
   float spacing = width / 20.0;
   float vspace = height /8;
   float vpos = (height / 2) - (3 * vspace);
-  for (int ind = 0; ind<6; ind++) {
-    opc.ledStrip((ind * 64), 16, (width / 2), vpos, spacing, radians(180), false);
-    vpos += vspace;
-  }
+  for (int ind = 0; ind<3; ind++) {
+   opc.ledStrip((ind * 16), 16, (width / 2), vpos, spacing, radians(180), false);
+   vpos += vspace;
+ }
 
   //opc.ledGrid(0 ,64 ,6 ,(width / 2) + (32 * spacing),height/2,spacing,height/8,0,false);
 
