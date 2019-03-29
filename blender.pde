@@ -163,7 +163,8 @@ renderGradient();
   float vspace = height /8;
   float vpos = (height / 2) - (3 * vspace);
   for (int ind = 0; ind<3; ind++) {
-   opc.ledStrip((ind * 16), 16, (width / 2), vpos, spacing, radians(180), false);
+   opc.ledStrip((ind * 16), 16, (width / 2), vpos, spacing, radians(180), ((ind % 2)>0));
+   //creates each middle strip reversed order
    vpos += vspace;
  }
 
