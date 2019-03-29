@@ -7,7 +7,7 @@ import java.io.*;
 
 //properties file
 Properties configFile;
-
+Date mydate;
 color[] palette = {color(0,0,0), color(255,255,255), color(0,0,0)};
 PGraphics renderer;
 //PShape compass;
@@ -21,7 +21,7 @@ PGraphics renderer;
   float dx;
   float dy;
   float st;
-
+int frmRate=1;
 float mAngle = 0;//60;
 String Loc="";
 String lat ="";// "43.988";
@@ -65,9 +65,10 @@ void buildImg() {
 }*/
 void getJSON() {
   try {
+    frmRate = round(frameRate) * 300;
     json = loadJSONObject(url);
     int dt = json.getInt("dt");
-    Date mydate = new java.util.Date(dt * 1000L);//date of reading
+    mydate = new java.util.Date(dt * 1000L);//date of reading
     JSONObject coord = json.getJSONObject("coord");
     JSONObject sys = json.getJSONObject("sys");
     Loc = json.getString("name") +", "+ sys.getString("country");
@@ -164,7 +165,6 @@ renderGradient();
   float vpos = (height / 2) - (3 * vspace);
   for (int ind = 0; ind<3; ind++) {
    opc.ledStrip((ind * 16), 16, (width / 2), vpos, spacing, radians(180), ((ind % 2)>0));
-   //creates each middle strip reversed order
    vpos += vspace;
  }
 
@@ -179,10 +179,10 @@ renderGradient();
 }
 void draw() {
   
-surface.setTitle(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn",
-    Loc, deg, knots));
-  if (frameCount % (round(frameRate)*300)==0) {//every 5 minutes no matter the frame rate
-    println("get new data");
+surface.setTitle(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn at %s",
+    Loc, deg, knots,mydate));
+  if (frameCount % frmRate<1) {//every 5 minutes no matter the frame rate
+    println("get new data"); //<>//
     thread("getJSON");
     //thread("buildImg");
     //thread("renderGradient");
@@ -225,8 +225,8 @@ surface.setTitle(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn",
   textSize(15);
   textAlign(LEFT);
   fill(255);
-  text(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn",
-    Loc, deg, knots),95,18);
+  text(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn at %s ",
+    Loc, deg, knots, mydate),95,18);
   
 
 }
