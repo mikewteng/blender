@@ -6,13 +6,14 @@ import java.io.*;
 //properties file
 Properties configFile;
 Date mydate;
+boolean pwrSwitch = true;
 color[] palette = {color(0,0,0), color(255,255,255), color(0,0,0)};
 PGraphics renderer;
 //PShape compass;
 float steps=25;
 float windAngle;
 float radius,origin,offset,ox,oy,dx,dy,st,deg,cardinal,knots,WSO,h;
-int frmRate=1;
+int frmRate=1,homekitBrightness=100,homekitHue,homekitSaturation;
 float mAngle = 0;//60;
 String Loc="";
 String lat = "43.988";
@@ -24,9 +25,9 @@ int newx,s,b;
 JSONObject json;
 void getJSON() {
   try {
-    frmRate = round(frameRate) * 300;
-    json = loadJSONObject(url);
-    int dt = json.getInt("dt");
+    frmRate = round(frameRate) * 20;
+    json = loadJSONObject(url);    
+   int dt = json.getInt("dt");
     mydate = new java.util.Date(dt * 1000L);//date of reading
  //   JSONObject coord = json.getJSONObject("coord");
     JSONObject sys = json.getJSONObject("sys");
@@ -51,11 +52,19 @@ void getJSON() {
   }
 }
 void getConfigJSON(){
- json = loadJSONObject("http://192.168.1.23:5000");
+ json = loadJSONObject("http://192.168.1.23:5000/setHSBColor?Saturation="+ s +"&Hue="+ h);
  lon=(json.getJSONArray("lon")).getString(0);
  lat=(json.getJSONArray("lat")).getString(0);
+ pwrSwitch = (json.getInt("SwitchStatus")==1);
+ homekitBrightness = pwrSwitch?json.getJSONArray("Brightness").getInt(0):0;
+// homekitHue = json.getJSONArray("Hue").getInt(0);
+ //homekitSaturation = json.getJSONArray("Saturation").getInt(0);
+ 
   url="http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lon +"&APPID="+ apikey;
+ if (frameCount % (frmRate*15)<1){
   getJSON();
+ }
+ frmRate = round(frameRate) * 20;
 }
 void setup() {
     try {
@@ -73,15 +82,22 @@ void setup() {
     mAngle=Float.parseFloat(configFile.getProperty("mAngle"));
 //  url="http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lon +"&APPID="+ apikey;
  // getJSON();
-    getConfigJSON();
+try{
+  getConfigJSON();
+}
+catch(Exception e){
+  url="http://api.openweathermap.org/data/2.5/weather?lat="+ lat +"&lon="+ lon +"&APPID="+ apikey;
+  e.printStackTrace();
+}
+    getJSON();
     size(640, 640);
     colorMode(HSB, 360, 100, 100);
     h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue)
     s=100;
-    b=100;
-    palette[0]=color(360-h-10,s,40);
+    b=homekitBrightness;
+    palette[0]=color(360-h-10,s,map(b,0,100,0,40));
     palette[1]=color((360-h),s,b);
-    palette[2]=color((360-h-10),s,40); 
+    palette[2]=color((360-h-10),s,map(b,0,100,0,40)); 
 //new rendering engine
     renderer = createGraphics(width, height);
     renderer.beginDraw();
@@ -95,7 +111,7 @@ void setup() {
     dx = ox + cos(radians(windAngle))*radius;
     dy = oy + sin(radians(windAngle))*radius; 
     renderGradient();
-    opc = new OPC(this, "127.0.0.1", 7890);
+    opc = new OPC(this, "192.168.1.23", 7890);
     float spacing = width / 20.0;
     float vspace = height /8;
     float vpos = (height / 2) - (3 * vspace);
@@ -108,37 +124,39 @@ void setup() {
 void draw() {
   surface.setTitle(String.format("City:%s Wind Dir:%.1f Deg. Speed:%.1f kn at %s",
   Loc, deg, knots,mydate));
-  if (frameCount % frmRate<1) {//every 5 minutes no matter the frame rate
-    thread("getConfigJSON");
+  if ((frameCount % frmRate)<1) {//every 5 minutes no matter the frame rate
+   try{ getConfigJSON(); //<>//
+   }catch (Exception e){
+   }
   }
   renderGradient();
 //legend for speed
   stroke(0);
   textAlign(CENTER);
   textSize(5);
-  fill(color(360-map(0, 0, 30, 117, 360),s,b));
+  fill(color(360-map(0, 0, 30, 117, 360),s,100));
   rect(0, 0, 10, 20);
-  fill(color(360-map(10, 0, 30, 117, 360),s,b));
+  fill(color(360-map(10, 0, 30, 117, 360),s,100));
   rect(10, 0, 10, 20);
   fill(0);
   text("10",15,13);
-  fill(color(360-map(12.5, 0, 30, 117, 360),s,b));
+  fill(color(360-map(12.5, 0, 30, 117, 360),s,100));
   rect(20, 0, 10, 20);
-  fill(color(360-map(15, 0, 30, 117, 360),s,b));
+  fill(color(360-map(15, 0, 30, 117, 360),s,100));
   rect(30, 0, 10, 20);
-  fill(color(360-map(17.5, 0, 30, 117, 360),s,b));
+  fill(color(360-map(17.5, 0, 30, 117, 360),s,100));
   rect(40, 0, 10, 20);
- fill(color(360-map(20, 0, 30, 117, 360),s,b));
+ fill(color(360-map(20, 0, 30, 117, 360),s,100));
   rect(50,0,10,20);
   fill(0);
   text("20",55,13);
-  fill(color(360-map(22.5, 0, 30, 117, 360),s,b));
+  fill(color(360-map(22.5, 0, 30, 117, 360),s,100));
   rect(60, 0, 10, 20);
-  fill(color(360-map(25, 0, 30, 117, 360),s,b));
+  fill(color(360-map(25, 0, 30, 117, 360),s,100));
   rect(70, 0, 10, 20);
-  fill(color(360-map(27.5, 0, 30, 117, 360),s,b));
+  fill(color(360-map(27.5, 0, 30, 117, 360),s,100));
   rect(80, 0, 10, 20);
- fill(color(360-map(30, 0, 30, 117, 360),s,b));
+ fill(color(360-map(30, 0, 30, 117, 360),s,100));
   rect(90,0,10,20);
     fill(0);
   text("30",95,13);
@@ -156,10 +174,10 @@ void renderGradient(){
   windAngle=deg-90;
   h = map(knots, 0, 30, 117, 360);//maps knots from green(117 deg. hue to red 365 deg. hue)
   s=100;
-  b=100;
-  palette[0]=color(360-h-10,s,40);
+  b=homekitBrightness;
+  palette[0]=color(360-h-10,s,map(b,0,100,0,40));
   palette[1]=color((360-h),s,b);
-  palette[2]=color((360-h-10),s,40); 
+  palette[2]=color((360-h-10),s,map(b,0,100,0,40)); 
   //windspeed offset
   WSO = steps + (round(knots)*(1/(frameRate/15)));
   if(-1*offset<(origin+WSO)){
